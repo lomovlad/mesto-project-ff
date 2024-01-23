@@ -1,0 +1,9 @@
+.header__link {
+  margin-bottom: calc((100vw - 320px) / (1280 - 320) * (41 - 31) + 31px);
+}
+
+@media screen and (max-width: 320px) {
+  .header__link {
+    padding-left: 27px;
+  }
+}

@@ -1,0 +1,10 @@
+.element__caption {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.21;
+  font-weight: 900;
+  color: #000000;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}

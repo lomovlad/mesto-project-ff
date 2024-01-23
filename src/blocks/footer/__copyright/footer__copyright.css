@@ -1,0 +1,6 @@
+.footer__copyright {
+  margin: 0;
+  color: #545454;
+  font-size: calc((100vw - 20rem) / (80 - 20) * (1.125 - .875) + .875rem);
+  line-height: 1.22;
+}
