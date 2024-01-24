@@ -1,7 +1,7 @@
 // Открытие попапа
 function openPopup (popup) {
   popup.classList.add('popup_opened');
-  document.addEventListener('click', closePopupOverlay);
+  popup.addEventListener('click', closePopupOverlay);
   document.addEventListener('keydown', closePopupByEsc);
 };
 

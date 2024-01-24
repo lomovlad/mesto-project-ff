@@ -1,6 +1,6 @@
 import '../src/pages/index.css';
-import { createCard, popupShowImg } from './components/card.js';
-import { openPopup, closePopup } from './components/modal.js';
+import { createCard } from './components/card.js';
+import { openPopup, closePopup, closePopupOverlay } from './components/modal.js';
 import { initialCards } from './components/cards.js';
 
 const profile = document.querySelector('.profile');
@@ -15,7 +15,6 @@ const profileJob = profile.querySelector('.profile__description');
 const cardList = document.querySelector('.elements__list');
 // Попап редактирования
 const popupEdit = document.querySelector('.popup-edit');
-const btnClosePopupEdit = popupEdit.querySelector('.popup__close-btn');
 // Форма редактирования
 const formPopupEdit = popupEdit.querySelector('.popup__form');
 // const submitButtonEdit = formPopupEdit.querySelector('.popup__save-btn');
@@ -23,14 +22,16 @@ const inputName = formPopupEdit.querySelector('.popup__input_user_name');
 const inputJob = formPopupEdit.querySelector('.popup__input_user_job');
 // Попап добавления карточек
 const popupAddCard = document.querySelector('.popup-add');
-const closePopupAddBtn = popupAddCard.querySelector('.popup__close-btn');
 // Форма добавлениякарточки
 const formAddElement = popupAddCard.querySelector('.popup__form');
 // const submitButtonAdd = formAddElement.querySelector(config.submitButtonSelector); 
 const inputNameAdd = formAddElement.querySelector('.popup__input_user_name');
 const inputUrlAdd = formAddElement.querySelector('.popup__input_user_job');
-// Попап просмотра фото
-const closePopupShowImg = popupShowImg.querySelector('.popup__close-btn');
+// Попап просмотра картинки
+const popupShowImg = document.querySelector('.popup-img');
+const popupShowImgPic = popupShowImg.querySelector('.popup__img-increased');
+const popupShowImgName = popupShowImg.querySelector('.popup-img__name');
+const buttonCloseList = document.querySelectorAll('.popup__close-btn');
 
 
 // Установить значения инпутов из информации профиля
@@ -40,17 +41,34 @@ function setInputValue () {
 };
 
 // Изменение полей профиля из формы редактирования
-function handleFormSubmit (evt) {
+function handleFormEditSubmit (evt) {
   evt.preventDefault();
   profileName.textContent = inputName.value;
   profileJob.textContent = inputJob.value;
   closePopup(popupEdit);
 };
 
+// Открытие попапа просмотра изображения
+function openPopupImg (name, link) {
+  openPopup(popupShowImg);
+  popupShowImgName.textContent = name;
+  popupShowImgPic.src = link;
+  popupShowImgPic.alt = name;
+};
+
+// Удаление карточки
+function onDelete (cardElem) {
+  cardElem.remove();
+};
+
+// Смена состояния лайка карточки
+function onLike (likeElem) {
+  likeElem.classList.toggle('element__like_active');
+};
 
 // Рендер карточек по умолчанию по append
 function renderCard (data, container, position = 'append') {
-  const renderNewElement = createCard(data);
+  const renderNewElement = createCard(data, onLike, onDelete, openPopupImg);
   switch (position) {
     case 'append':
       container.append(renderNewElement);
@@ -79,13 +97,10 @@ function handleFormAddSubmit (evt) {
     closePopup(popupAddCard);
 };
 
+
 editButton.addEventListener('click', () => {
   openPopup(popupEdit);
   setInputValue();
-});
-
-btnClosePopupEdit.addEventListener('click', () => {
-  closePopup(popupEdit);
 });
 
 addButton.addEventListener('click', () => {
@@ -93,13 +108,11 @@ addButton.addEventListener('click', () => {
   formAddElement.reset();
 });
 
-closePopupAddBtn.addEventListener('click', () => {
-  closePopup(popupAddCard);
-});
+buttonCloseList.forEach(btn => {
+  const popupCloseBtn = btn.closest('.popup');
+  popupCloseBtn.addEventListener('mousedown', closePopupOverlay);
+  btn.addEventListener('click', () => closePopup(popup)); 
+})
 
-closePopupShowImg.addEventListener('click', () => {
-  closePopup(popupShowImg);
-});
-
-formPopupEdit.addEventListener('submit', handleFormSubmit); 
+formPopupEdit.addEventListener('submit', handleFormEditSubmit); 
 formAddElement.addEventListener('submit', handleFormAddSubmit);
