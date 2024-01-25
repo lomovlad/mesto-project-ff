@@ -1,14 +1,12 @@
 // Открытие попапа
 function openPopup (popup) {
   popup.classList.add('popup_opened');
-  popup.addEventListener('click', closePopupOverlay);
   document.addEventListener('keydown', closePopupByEsc);
 };
 
 // Закрытие попапа
 function closePopup (popup) {
   popup.classList.remove('popup_opened');
-  document.removeEventListener('click', closePopupOverlay);
   document.removeEventListener('keydown', closePopupByEsc);
 };
 

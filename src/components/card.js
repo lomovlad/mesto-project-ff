@@ -1,7 +1,17 @@
 const templateElement = document.querySelector('#card-element').content.querySelector('.element');
 
+// Удаление карточки
+function onDelete (cardElem) {
+  cardElem.remove();
+};
+
+// Смена состояния лайка карточки
+function onLike (likeElem) {
+  likeElem.classList.toggle('element__like_active');
+};
+
 // Создание и наполнение карточек 
-export function createCard ({name, link}, onLikeFunction, onDeleteFunction, openPopupFunction) {
+function createCard ({name, link}, onLikeFunction, onDeleteFunction, openPopupFunction) {
   const cardElement = templateElement.cloneNode(true);
   const nameCard = cardElement.querySelector('.element__caption');
   const imageCard = cardElement.querySelector('.element__photo');
@@ -28,3 +38,5 @@ export function createCard ({name, link}, onLikeFunction, onDeleteFunction, open
 
   return cardElement;
 };
+
+export { onDelete, onLike, createCard };

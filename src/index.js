@@ -1,5 +1,5 @@
 import '../src/pages/index.css';
-import { createCard } from './components/card.js';
+import { onDelete, onLike, createCard } from './components/card.js';
 import { openPopup, closePopup, closePopupOverlay } from './components/modal.js';
 import { initialCards } from './components/cards.js';
 
@@ -56,15 +56,6 @@ function openPopupImg (name, link) {
   popupShowImgPic.alt = name;
 };
 
-// Удаление карточки
-function onDelete (cardElem) {
-  cardElem.remove();
-};
-
-// Смена состояния лайка карточки
-function onLike (likeElem) {
-  likeElem.classList.toggle('element__like_active');
-};
 
 // Рендер карточек по умолчанию по append
 function renderCard (data, container, position = 'append') {
@@ -112,7 +103,7 @@ buttonCloseList.forEach(btn => {
   const popupCloseBtn = btn.closest('.popup');
   popupCloseBtn.addEventListener('mousedown', closePopupOverlay);
   btn.addEventListener('click', () => closePopup(popup)); 
-})
+});
 
 formPopupEdit.addEventListener('submit', handleFormEditSubmit); 
 formAddElement.addEventListener('submit', handleFormAddSubmit);
