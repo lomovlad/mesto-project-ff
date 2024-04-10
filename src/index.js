@@ -20,10 +20,11 @@ import {
   offLikeCard,
   updateAvatar,
 } from "./components/api.js";
+import { setLoadingState } from "./components/utils.js";
 
 const profile = document.querySelector(".profile");
-const popupList = document.querySelectorAll(".popup");
 // Кнопки
+const editAvatarButton = profile.querySelector(".profile__avatar-wrapper");
 const editButton = profile.querySelector(".profile__edit-button");
 const addButton = profile.querySelector(".profile__add-button");
 // Поля профиля
@@ -41,7 +42,6 @@ const inputUrlAvatar = formPopupUpdateAvatar.querySelector(".popup__input_avatar
 const popupEdit = document.querySelector(".popup-edit");
 // Форма редактирования
 const formPopupEdit = popupEdit.querySelector(".popup__form");
-const submitButtonEdit = formPopupEdit.querySelector(".popup__save-btn");
 const inputName = formPopupEdit.querySelector(".popup__input_user_name");
 const inputJob = formPopupEdit.querySelector(".popup__input_user_job");
 // Попап добавления карточек
@@ -58,59 +58,47 @@ const buttonCloseList = document.querySelectorAll(".popup__close-btn");
 
 let currentUserId;
 
-// Обновление информации профиля от сервера
-function setUserInfo() {
-  getUserData().then((userData) => {
-    profileName.textContent = userData.name;
-    profileJob.textContent = userData.about;
-    profileAvatar.src = userData.avatar;
-  });
-}
 
-setUserInfo();
+// Передача ошибки в блок catch
+function handleRequestError(error) {
+  console.error('Ошибка:', error.message);
+};
 
 // Установка значений инпутов
 function setInputValue() {
-  getUserData().then((userData) => {
-    inputName.value = userData.name;
-    inputJob.value = userData.about;
-  });
-}
-
-// Проверка загрузки
-function renderLoading(isLoading) {
-  if(isLoading) {
-    submitButtonEdit.textContent = 'Сохранение...'
-}
+    inputName.value = profileName.textContent;
+    inputJob.value = profileJob.textContent;
 }
 
 // Обработка формы редактирования инфо о пользователе
 function handleFormEditSubmit(evt) {
   evt.preventDefault();
-  renderLoading(true);
+  setLoadingState(true);
 
   const newName = inputName.value;
   const newAbout = inputJob.value;
 
   updateUserInfo(newName, newAbout).then((userData) => {
-    renderLoading(false)
+    setLoadingState(false);
     profileName.textContent = userData.name;
     profileJob.textContent = userData.about;
     closePopup(popupEdit);
-  });
+  })
+  .catch(handleRequestError);
 }
 
 // Обработка формы обновления аватара
 function handleFormAvatarSubmit(evt) {
   evt.preventDefault();
-  renderLoading(true);
+  setLoadingState(true);
 
   const newAvatar = inputUrlAvatar.value;
   updateAvatar(newAvatar).then((userData) => {
-    renderLoading(false)
+    setLoadingState(false)
     profileAvatar.src = userData.avatar;
     closePopup(popupUpdateAvatar);
   })
+  .catch(handleRequestError);
 }
 
 // Открытие попапа просмотра изображения
@@ -132,6 +120,7 @@ function renderCard(data, userId, container, position = "append") {
         onLike(buttonLikeCard);
         likeCounterElement.textContent = `${updatedCard.likes.length}`;
       })
+      .catch(handleRequestError);
     },
     (buttonLikeCard) => {
       offLikeCard(data._id).then((updatedCard) => {
@@ -139,11 +128,13 @@ function renderCard(data, userId, container, position = "append") {
         offLike(buttonLikeCard);
         likeCounterElement.textContent = `${updatedCard.likes.length}`;
       })
+      .catch(handleRequestError);
     },
     (cardElement) => {
       deleteCard(data._id).then(() => {
         onDelete(cardElement);
-      });
+      })
+      .catch(handleRequestError);;
     },
     openPopupImg
   );
@@ -160,17 +151,22 @@ function renderCard(data, userId, container, position = "append") {
 }
 
 // Получение и рендер карточек с сервера
-Promise.all([getUserData(), getCards()]).then(([userData, cards]) => {
+Promise.all([getUserData(), getCards()])
+.then(([userData, cards]) => {
   cards.forEach((card) => {
     currentUserId = userData._id;
     renderCard(card, userData._id, cardList);
   });
-});
+  profileName.textContent = userData.name;
+  profileJob.textContent = userData.about;
+  profileAvatar.src = userData.avatar;
+})
+.catch(handleRequestError);
 
 // Создание и добавление карточек в разметку из формы
 function handleFormAddSubmit(evt) {
   evt.preventDefault();
-  renderLoading(true);
+  setLoadingState(true);
 
   const dataCard = {
     name: inputNameAdd.value,
@@ -178,18 +174,17 @@ function handleFormAddSubmit(evt) {
   };
 
   addNewCard(dataCard.name, dataCard.link).then((newDataCard) => {
-    renderLoading(false);
+    setLoadingState(false);
     renderCard(newDataCard, currentUserId, cardList, "prepend");
     closePopup(popupAddCard);
-  });
+  })
+  .catch(handleRequestError);
 }
 
 // Слушатель кнопки обновления аватара
-profileAvatar.addEventListener("click", () => {
+editAvatarButton.addEventListener("click", () => {
   openPopup(popupUpdateAvatar);
 })
-
-
 
 // Слушатель кнопки редактирования инфо профиля
 editButton.addEventListener("click", () => {
@@ -213,10 +208,8 @@ Array.from(buttonCloseList).forEach((btn) => {
   }
 });
 
-
 formPopupEdit.addEventListener("submit", handleFormEditSubmit);
 formAddElement.addEventListener("submit", handleFormAddSubmit);
 formPopupUpdateAvatar.addEventListener("submit", handleFormAvatarSubmit);
 
 enableValidation(config);
-
