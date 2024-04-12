@@ -1,0 +1,3 @@
+.popup__label:nth-of-type(2) .popup__error {
+  min-height: 48px;
+}
